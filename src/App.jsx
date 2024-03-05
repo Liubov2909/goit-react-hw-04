@@ -18,7 +18,6 @@ function App() {
 
   useEffect(() => {
     if (query === "") {
-      setImages([]);
       return;
     }
 
@@ -43,17 +42,12 @@ function App() {
     addNewImages();
   }, [query, page]);
 
-  const handleSearch = (e) => {
-    setShowLoader(true);
-    e.preventDefault();
-    const searchTerm = e.target.search.value.trim();
-    if (searchTerm !== "") {
-      setQuery(searchTerm);
-      setPage(1);
-    } else {
-      toast.error("Fill in the input field");
-    }
-  };
+  function handleQuery(resQuery) {
+    setQuery(resQuery);
+    setPage(1);
+    setError(null);
+    setImages([]);
+  }
 
   const handleMoreImages = () => {
     setPage(page + 1);
@@ -70,7 +64,7 @@ function App() {
 
   return (
     <>
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSubmit={handleQuery} />
       {error && <ErrorMessage error={error} />}
       {images.length > 0 && (
         <ImageGallery images={images} openModal={openModal} />
