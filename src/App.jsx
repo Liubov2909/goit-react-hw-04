@@ -18,6 +18,7 @@ function App() {
 
   useEffect(() => {
     if (query === "") {
+      setImages([]);
       return;
     }
 
@@ -26,25 +27,28 @@ function App() {
         setShowLoader(true);
         setError(false);
         const data = await getImages(query, page);
-        setImages((images) => {
-          return [...images, ...data];
-        });
+        if (page === 1) {
+          setImages(data);
+        } else {
+          setImages((prevImages) => [...prevImages, ...data]);
+        }
         toast.success("HTTP success!");
       } catch (error) {
         setError(true);
+        toast.error("Error fetching images");
       } finally {
         setShowLoader(false);
       }
     };
-
     addNewImages();
   }, [query, page]);
 
   const handleSearch = (e) => {
     setShowLoader(true);
     e.preventDefault();
-    if (e.target.search.value.trim() !== "") {
-      setQuery(e.target.search.value);
+    const searchTerm = e.target.search.value.trim();
+    if (searchTerm !== "") {
+      setQuery(searchTerm);
       setPage(1);
     } else {
       toast.error("Fill in the input field");
@@ -73,7 +77,7 @@ function App() {
       )}
       {showLoader && <Loader />}
       {images.length > 0 && <LoadMoreBtn loadMoreImages={handleMoreImages} />}
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
       <ImageModal
         isOpen={selectedImageUrl !== null}
         onRequestClose={closeModal}
